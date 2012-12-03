@@ -1,0 +1,14 @@
+bld.shlib(
+	packages = 'gio-2.0',
+	features = 'c cshlib',
+	target   = "subzero",
+	uselib   = 'GIO-2.0',
+	source   = 'subzero-browser.vala subzero-dns.vala subzero-util.vala',
+	gir      = 'subzero-0.1',
+)
+
+bld.program(
+	target = 'example',
+	use    = 'subzero',
+	source = 'subzero-example.vala',
+)
