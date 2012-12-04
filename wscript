@@ -19,4 +19,4 @@ def configure(conf):
 	conf.check_cfg(package='gio-2.0', mandatory=1, args='--cflags --libs')
 
 def build(bld):
-	bld.recurse('subzero')
+	bld.recurse('subzero examples')

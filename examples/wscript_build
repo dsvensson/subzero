@@ -1,0 +1,5 @@
+bld.program(
+	target = 'browse',
+	use    = 'subzero',
+	source = 'browse.vala',
+)

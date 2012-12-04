@@ -6,9 +6,3 @@ bld.shlib(
 	source   = 'subzero-browser.vala subzero-dns.vala subzero-util.vala',
 	gir      = 'subzero-0.1',
 )
-
-bld.program(
-	target = 'example',
-	use    = 'subzero',
-	source = 'subzero-example.vala',
-)
