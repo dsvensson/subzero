@@ -125,7 +125,7 @@ public class SubZero.Browser : GLib.Object
 
 		try {
 			var bytes_read = server_socket.receive(buffer);
-			GLib.warning (@"received $bytes_read bytes");
+			GLib.debug(@"received $bytes_read bytes");
 			if (bytes_read == 0)
 				return true;
 
@@ -133,14 +133,14 @@ public class SubZero.Browser : GLib.Object
 
 			DNS.parse(new GLib.DataInputStream(new GLib.MemoryInputStream.from_data (buffer, null)));
 		} catch (GLib.Error e) {
-			GLib.warning (@"Could not parse MDNS packet: $(e.message)");
+			GLib.warning(@"Could not parse MDNS packet: $(e.message)");
 			try {
 				GLib.FileIOStream stream;
 				GLib.File.new_tmp("packet-XXXXXX.data", out stream);
 				stream.get_output_stream().write(buffer);
 				GLib.warning(@"Wrote dump in $(GLib.Environment.get_tmp_dir())");
 			} catch (GLib.Error e2) {
-				GLib.error (@"Could not write debug file: $(e2.message)");
+				GLib.warning(@"Could not write debug file: $(e2.message)");
 			}
 		}
 

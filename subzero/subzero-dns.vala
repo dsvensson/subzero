@@ -153,33 +153,33 @@ internal class SubZero.DNS {
 			stream.read_uint32(); // TTL
 			var data_len = stream.read_uint16();
 
-			GLib.warning (@"[$i] Record name: $name");
+			GLib.debug(@"[$i] Record name: $name");
 
 			switch (type) {
 			case RecordType.PTR:
 				var ptr_name = parse_record_name(stream);
-				GLib.warning(" PTR: %s", ptr_name);
+				GLib.debug(" PTR: %s", ptr_name);
 				break;
 			case RecordType.TXT:
 				var data = new uint8[data_len];
 				stream.read_byte();
 				stream.read(data[0:data.length - 1]);
-				GLib.warning(" TXT: %s", (string) data);
+				GLib.debug(" TXT: %s", (string) data);
 				break;
 			case RecordType.SRV:
 				stream.read_uint16(); // priority
 				stream.read_uint16(); // weight
 				var port = stream.read_uint16();
 				var service_name = parse_record_name(stream);
-				GLib.warning(" SRV: %s:%u", service_name, port);
+				GLib.debug(" SRV: %s:%u", service_name, port);
 				break;
 			case RecordType.A:
 				var addr = parse_inet_address(stream, data_len);
-				GLib.warning(@" IPv4: $addr");
+				GLib.debug(@" IPv4: $addr");
 				break;
 			case RecordType.AAAA:
 				var addr = parse_inet_address(stream, data_len);
-				GLib.warning(@" IPv6: $addr");
+				GLib.debug(@" IPv6: $addr");
 				break;
 			case RecordType.NSEC:
 				parse_record_name(stream); // next domain thing
@@ -200,9 +200,9 @@ internal class SubZero.DNS {
 
 		var flags = stream.read_uint16();
 		if (Flags.Response.matches(flags)) {
-			GLib.warning ("Got Response");
+			GLib.debug("Got Response");
 		} else {
-			GLib.warning ("Got Query");
+			GLib.debug("Got Query");
 			return;
 		}
 
@@ -211,25 +211,25 @@ internal class SubZero.DNS {
 		var authority_rrs = stream.read_uint16();
 		var additional_rrs = stream.read_uint16();
 
-		GLib.warning (@"questions: $questions, answer_rrs: $answer_rrs, authority_rrs: $authority_rrs, additional_rrs: $additional_rrs");
+		GLib.debug(@"questions: $questions, answer_rrs: $answer_rrs, authority_rrs: $authority_rrs, additional_rrs: $additional_rrs");
 
 		if (questions > 0) {
-			GLib.warning ("Parsing questions:");
+			GLib.debug("Parsing questions:");
 			parse_record(stream, questions);
 		}
 
 		if (answer_rrs > 0) {
-			GLib.warning ("Parsing answers rrs:");
+			GLib.debug("Parsing answers rrs:");
 			parse_record(stream, answer_rrs);
 		}
 
 		if (authority_rrs > 0) {
-			GLib.warning ("Parsing authority rrs:");
+			GLib.debug("Parsing authority rrs:");
 			parse_record(stream, authority_rrs);
 		}
 
 		if (additional_rrs > 0) {
-			GLib.warning ("Parsing additional rrs:");
+			GLib.debug("Parsing additional rrs:");
 			parse_record(stream, additional_rrs);
 		}
 	}

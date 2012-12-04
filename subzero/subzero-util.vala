@@ -27,34 +27,37 @@ internal class SubZero.Util
 	 */
 	public static void hexdump(uint8[] buffer)
 	{
-		GLib.print("0000: ");
+		var sb = new GLib.StringBuilder();
+		sb.append("0000: ");
 		var i = 0;
 		for (; i < buffer.length; i++) {
-			GLib.print("%02x ", buffer[i]);
+			sb.append_printf("%02x ", buffer[i]);
 			if (((i+1) % 8) == 0)
-				GLib.print(" ");
+				sb.append(" ");
 			if (((i+1) % 16) == 0) {
 				for (var j = i - 15; j < buffer.length && j <= i; j++) {
 					uint8 b = buffer[j];
-					GLib.print("%c ", (b >= 0x21 && b <= 0x7e) ? b : '.');
+					sb.append_printf("%c ", (b >= 0x21 && b <= 0x7e) ? b : '.');
 					if (((j+1) % 8) == 0)
-						GLib.print(" ");
+						sb.append(" ");
 				}
-				GLib.print("\n%04x: ", i + 1);
+				sb.append_printf("\n%04x: ", i + 1);
 			}
 		}
 
 		if ((i % 16) != 0) {
 			var r = 0;
 			for (var j = 1; j < (50 - (i % 16) * 3); j++)
-				GLib.print(" ");
+				sb.append(" ");
 			for (var j = i - (i % 16); j < buffer.length && j <= i; j++, r++) {
 				uint8 b = buffer[j];
-				GLib.print("%c ", (b >= 0x21 && b <= 0x7e) ? b : '.');
+				sb.append_printf("%c ", (b >= 0x21 && b <= 0x7e) ? b : '.');
 				if (((r+1) % 8) == 0)
-					GLib.print(" ");
+					sb.append(" ");
 			}
-			GLib.print("\n");
+			sb.append("\n");
 		}
+
+		GLib.debug("Dump:\n\n%s", sb.str);
 	}
 }
