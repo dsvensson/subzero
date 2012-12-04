@@ -108,13 +108,10 @@ internal class SubZero.DNS {
 				break;
 
 			/* If first two bits sets, remaining part of the name
-			 * can be found at the offset found in next byte.
+			 * can be found at the offset found in 14 bits.
 			 */
 			if ((len & 0xc0) != 0) {
 				var seek_pos = (uint16)((len & ~0xc0) << 8 | stream.read_byte());
-				/* Skip one more byte as we'll read the termination from
-				 * the other record name.
-				 */
 				var restore_pos = stream.tell();
 				stream.seek(seek_pos, GLib.SeekType.SET);
 				parse_record_name_recurse(stream, name, ref pos);
