@@ -3,6 +3,6 @@ bld.shlib(
 	features = 'c cshlib',
 	target   = "subzero",
 	uselib   = 'GIO-2.0',
-	source   = 'subzero-browser.vala subzero-dns.vala subzero-util.vala',
+	source   = 'subzero-browser.vala subzero-dns.vala subzero-dns-record-visitor.vala subzero-util.vala',
 	gir      = 'subzero-0.1',
 )

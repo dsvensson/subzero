@@ -17,37 +17,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-public interface SubZero.DNSRecordVisitor
-{
-	public abstract void pointer_record(string name, string domain);
-	public abstract void text_record(string name, string text);
-	public abstract void service_record(string name, string domain, uint16 port);
-	public abstract void address_record(string name, GLib.InetAddress address);
-}
-
-internal class SubZero.DebugDNSRecordVisitor : DNSRecordVisitor
-{
-	public void pointer_record(string name, string domain)
-	{
-		GLib.debug(@"Name: $name, PTR: $domain");
-	}
-
-	public void text_record(string name, string text)
-	{
-		GLib.debug(@"Name: $name, TXT: $text");
-	}
-
-	public void service_record(string name, string domain, uint16 port)
-	{
-		GLib.debug(@"Name: $name, SRV: $domain:$port");
-	}
-
-	public void address_record(string name, GLib.InetAddress address)
-	{
-		GLib.debug(@"Name: $name, A/AAAA: $address");
-	}
-}
-
 internal class SubZero.DNS {
 	private const int MAX_NAME_LENGTH = 255;
 	private const int MAX_LABEL_LENGTH = 63;
