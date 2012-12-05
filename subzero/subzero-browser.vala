@@ -131,7 +131,7 @@ public class SubZero.Browser : GLib.Object
 
 			Util.hexdump(buffer[0:bytes_read]);
 
-			DNS.parse(new GLib.DataInputStream(new GLib.MemoryInputStream.from_data (buffer, null)));
+			DNS.parse(new GLib.DataInputStream(new GLib.MemoryInputStream.from_data (buffer, null)), new DebugDNSRecordVisitor());
 		} catch (GLib.Error e) {
 			GLib.warning(@"Could not parse MDNS packet: $(e.message)");
 			try {

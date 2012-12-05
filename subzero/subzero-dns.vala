@@ -17,9 +17,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+public interface SubZero.DNSRecordVisitor
+{
+	public abstract void pointer_record(string name, string domain);
+	public abstract void text_record(string name, string text);
+	public abstract void service_record(string name, string domain, uint16 port);
+	public abstract void address_record(string name, GLib.InetAddress address);
+}
+
+internal class SubZero.DebugDNSRecordVisitor : DNSRecordVisitor
+{
+	public void pointer_record(string name, string domain)
+	{
+		GLib.debug(@"Name: $name, PTR: $domain");
+	}
+
+	public void text_record(string name, string text)
+	{
+		GLib.debug(@"Name: $name, TXT: $text");
+	}
+
+	public void service_record(string name, string domain, uint16 port)
+	{
+		GLib.debug(@"Name: $name, SRV: $domain:$port");
+	}
+
+	public void address_record(string name, GLib.InetAddress address)
+	{
+		GLib.debug(@"Name: $name, A/AAAA: $address");
+	}
+}
+
 internal class SubZero.DNS {
 	private const int MAX_NAME_LENGTH = 255;
 	private const int MAX_LABEL_LENGTH = 63;
+
 
 	public enum Flags
 	{
@@ -143,7 +175,7 @@ internal class SubZero.DNS {
 		return new GLib.InetAddress.from_bytes(buffer[0:len], (len == 4) ? GLib.SocketFamily.IPV4 : GLib.SocketFamily.IPV6);
 	}
 
-	private static void parse_record(GLib.DataInputStream stream, uint16 count)
+	private static void parse_record(GLib.DataInputStream stream, uint16 count, DNSRecordVisitor visitor)
 		throws GLib.Error
 	{
 		for (var i = 0; i < count; i++) {
@@ -153,33 +185,31 @@ internal class SubZero.DNS {
 			stream.read_uint32(); // TTL
 			var data_len = stream.read_uint16();
 
-			GLib.debug(@"[$i] Record name: $name");
-
 			switch (type) {
 			case RecordType.PTR:
 				var ptr_name = parse_record_name(stream);
-				GLib.debug(" PTR: %s", ptr_name);
+				visitor.pointer_record(name, ptr_name);
 				break;
 			case RecordType.TXT:
 				var data = new uint8[data_len];
 				stream.read_byte();
 				stream.read(data[0:data.length - 1]);
-				GLib.debug(" TXT: %s", (string) data);
+				visitor.text_record(name, (string) data);
 				break;
 			case RecordType.SRV:
 				stream.read_uint16(); // priority
 				stream.read_uint16(); // weight
 				var port = stream.read_uint16();
 				var service_name = parse_record_name(stream);
-				GLib.debug(" SRV: %s:%u", service_name, port);
+				visitor.service_record(name, service_name, port);
 				break;
 			case RecordType.A:
 				var addr = parse_inet_address(stream, data_len);
-				GLib.debug(@" IPv4: $addr");
+				visitor.address_record(name, addr);
 				break;
 			case RecordType.AAAA:
 				var addr = parse_inet_address(stream, data_len);
-				GLib.debug(@" IPv6: $addr");
+				visitor.address_record(name, addr);
 				break;
 			case RecordType.NSEC:
 				parse_record_name(stream); // next domain thing
@@ -193,7 +223,7 @@ internal class SubZero.DNS {
 		}
 	}
 
-	public static void parse(GLib.DataInputStream stream)
+	public static void parse(GLib.DataInputStream stream, DNSRecordVisitor visitor)
 		throws GLib.Error
 	{
 		stream.read_uint16(); /* transaction_id */
@@ -215,22 +245,22 @@ internal class SubZero.DNS {
 
 		if (questions > 0) {
 			GLib.debug("Parsing questions:");
-			parse_record(stream, questions);
+			parse_record(stream, questions, visitor);
 		}
 
 		if (answer_rrs > 0) {
 			GLib.debug("Parsing answers rrs:");
-			parse_record(stream, answer_rrs);
+			parse_record(stream, answer_rrs, visitor);
 		}
 
 		if (authority_rrs > 0) {
 			GLib.debug("Parsing authority rrs:");
-			parse_record(stream, authority_rrs);
+			parse_record(stream, authority_rrs, visitor);
 		}
 
 		if (additional_rrs > 0) {
 			GLib.debug("Parsing additional rrs:");
-			parse_record(stream, additional_rrs);
+			parse_record(stream, additional_rrs, visitor);
 		}
 	}
 }
