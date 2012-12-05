@@ -40,7 +40,7 @@ public class SubZero.Browser : GLib.Object
 
 	public bool is_running { get; private set; default = false; }
 	public uint interval { get; set; default = 10; }
-	public string[] services { get; set; default = new string[] { "_xmms2._tcp" }; }
+	public string[] services { get; set; default = {}; }
 
 	public Browser()
 	{

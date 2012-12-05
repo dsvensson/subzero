@@ -76,9 +76,6 @@ internal class SubZero.DNS {
 				stream.put_string(part);
 			}
 
-			stream.put_byte((uint8) "local".length);
-			stream.put_string("local");
-
 			stream.put_byte(0x0);
 			stream.put_uint16(RecordType.PTR);
 			stream.put_uint16(0x0001);
