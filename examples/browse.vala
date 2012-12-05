@@ -17,19 +17,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-public class SubZero.Example
+public static void main (string[] args)
 {
-	public static void main (string[] args)
-	{
-		var ml = new GLib.MainLoop();
+	var ml = new GLib.MainLoop();
 
-		var sc = new SubZero.Browser();
-		sc.service_event.connect((data) => {
-			GLib.warning("got data: %s", data);
-		});
+	var sc = new SubZero.Browser();
+	sc.services = { "_xmms2._tcp.local" };
 
-		sc.start();
-		ml.run();
-		sc.stop();
-	}
+	sc.service_event.connect((service, hostname, port) => {
+		GLib.warning(@"Found $service at $hostname:$port");
+	});
+
+	sc.start();
+	ml.run();
+	sc.stop();
 }

@@ -17,6 +17,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+internal class SubZero.ServiceVisitor : BaseDNSRecordVisitor, DNSRecordVisitor
+{
+	private GLib.HashTable<string,bool> discovered = new HashTable<string,bool>(str_hash, str_equal);
+
+	private Browser browser;
+
+	public ServiceVisitor(SubZero.Browser browser)
+	{
+		this.browser = browser;
+	}
+
+	public new void service_record(string name, string hostname, uint16 port)
+	{
+		foreach (var service in browser.services) {
+			if (name.has_suffix(service) && !discovered.contains(name)) {
+				discovered.add(name);
+				browser.service_event(service, hostname, port);
+				break;
+			}
+		}
+	}
+}
+
 public class SubZero.Browser : GLib.Object
 {
 	private const uint16 MDNS_PORT = 5353;
@@ -27,7 +50,7 @@ public class SubZero.Browser : GLib.Object
 	private GLib.InetAddress inet_address_mdns = new GLib.InetAddress.from_string("224.0.0.251");
 	// private GLib.InetAddress inet6_address_mdns = new GLib.InetAddress.from_string("ff02::fb");
 
-	public signal void service_event(string data);
+	public signal void service_event(string service, string hostname, int port);
 
 	private GLib.Socket server_socket;
 	private GLib.Socket client_socket;
@@ -36,6 +59,7 @@ public class SubZero.Browser : GLib.Object
 	private uint server_source = -1;
 	private uint client_source = -1;
 
+	private DNSRecordVisitor visitor;
 	private uint8[] query;
 
 	public bool is_running { get; private set; default = false; }
@@ -44,6 +68,8 @@ public class SubZero.Browser : GLib.Object
 
 	public Browser()
 	{
+		visitor = new DebugDNSRecordVisitor(new ServiceVisitor(this));
+
 		this.notify["services"].connect((s, p) => {
 			try {
 				query = DNS.generate_ptr_query(services);
@@ -131,7 +157,7 @@ public class SubZero.Browser : GLib.Object
 
 			Util.hexdump(buffer[0:bytes_read]);
 
-			DNS.parse(new GLib.DataInputStream(new GLib.MemoryInputStream.from_data (buffer, null)), new DebugDNSRecordVisitor());
+			DNS.parse(new GLib.DataInputStream(new GLib.MemoryInputStream.from_data (buffer, null)), visitor);
 		} catch (GLib.Error e) {
 			GLib.warning(@"Could not parse MDNS packet: $(e.message)");
 			try {
