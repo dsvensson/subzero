@@ -25,7 +25,7 @@ public static void main (string[] args)
 	sc.services = { "_xmms2._tcp.local" };
 
 	sc.service_event.connect((service, hostname, port) => {
-		GLib.warning(@"Found $service at $hostname:$port");
+		GLib.print(@"Found $service at $hostname:$port\n");
 	});
 
 	sc.start();
