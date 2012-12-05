@@ -1,8 +1,18 @@
 bld.shlib(
 	packages = 'gio-2.0',
 	features = 'c cshlib',
-	target   = "subzero",
+	target   = 'subzero',
 	uselib   = 'GIO-2.0',
 	source   = 'subzero-browser.vala subzero-dns.vala subzero-dns-record-visitor.vala subzero-util.vala',
-	gir      = 'subzero-0.1',
+	gir      = 'SubZero-0.1',
+)
+
+
+bld(
+	name = 'subzero-typelib',
+	after = 'subzero',
+	source = 'SubZero-0.1.gir',
+	target = 'SubZero-0.1.typelib',
+	rule = 'g-ir-compiler --shared-library=libsubzero ${SRC} -o ${TGT}',
+	install_path = '${LIBDIR}/girepository-1.0'
 )
