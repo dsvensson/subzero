@@ -17,6 +17,7 @@ def options(opt):
 def configure(conf):
 	conf.load('compiler_c vala')
 	conf.check_cfg(package='gio-2.0', atleast_version='2.34.0', mandatory=1, args='--cflags --libs')
+	conf.find_program('g-ir-compiler', var='G_IR_COMPILER', mandatory=0)
 
 def build(bld):
 	bld.recurse('subzero examples')

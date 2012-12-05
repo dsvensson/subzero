@@ -7,12 +7,12 @@ bld.shlib(
 	gir      = 'SubZero-0.1',
 )
 
-
-bld(
-	name = 'subzero-typelib',
-	after = 'subzero',
-	source = 'SubZero-0.1.gir',
-	target = 'SubZero-0.1.typelib',
-	rule = 'g-ir-compiler --shared-library=libsubzero ${SRC} -o ${TGT}',
-	install_path = '${LIBDIR}/girepository-1.0'
-)
+if bld.env.G_IR_COMPILER:
+	bld(
+		name = 'typelib',
+		after = 'subzero',
+		source = 'SubZero-0.1.gir',
+		target = 'SubZero-0.1.typelib',
+		rule = '${G_IR_COMPILER} --shared-library=libsubzero ${SRC} -o ${TGT}',
+		install_path = '${LIBDIR}/girepository-1.0'
+	)
