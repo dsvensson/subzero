@@ -66,7 +66,7 @@ public class SubZero.Browser : GLib.Object
 	public uint interval { get; set; default = 10; }
 	public string[] services { get; set; default = {}; }
 
-	public Browser()
+	construct
 	{
 		visitor = new DebugDNSRecordVisitor(new ServiceVisitor(this));
 
