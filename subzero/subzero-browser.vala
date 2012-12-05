@@ -138,7 +138,7 @@ public class SubZero.Browser : GLib.Object
 				GLib.FileIOStream stream;
 				GLib.File.new_tmp("packet-XXXXXX.data", out stream);
 				stream.get_output_stream().write(buffer);
-				GLib.warning(@"Wrote dump in $(GLib.Environment.get_tmp_dir())");
+				GLib.warning(@"Wrote dns packet in $(GLib.Environment.get_tmp_dir())");
 			} catch (GLib.Error e2) {
 				GLib.warning(@"Could not write debug file: $(e2.message)");
 			}
