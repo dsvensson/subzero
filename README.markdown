@@ -16,6 +16,10 @@ wrapper, in a lot less lines of code, with a simple API and so SubZero was born.
 The name SubZero is to denote that it's a subpar zeroconf implementation, good enough to
 discover the services I need on the network and possibly others.
 
+Goals
+-----
+No bugs, and never ever support for registering services or taking the role of a proxy.
+
 Install
 -------
 
