@@ -52,6 +52,8 @@ internal class SubZero.ServiceVisitor : BaseDNSRecordVisitor, DNSRecordVisitor
 
 	public new void service_record(string name, uint16 cls, uint32 ttl, string hostname, uint16 port)
 	{
+		if (ttl == 0)
+			return;
 		foreach (var service in browser.services) {
 			if (!name.has_suffix(service))
 			    continue;
