@@ -20,12 +20,16 @@ Goals
 -----
 Stability, readability, and never ever support for registering services or taking the role as a proxy.
 
+Supported Platforms
+-------------------
+The library and the examples have been tested on both Debian GNU/Linux and Mac OS X 10.8.
+
 Install
 -------
 
     ./waf configure --prefix=/usr
     ./waf build
-    ./waf install
+    sudo ./waf install
     sudo ldconfig
     
 License
