@@ -18,7 +18,7 @@ discover the services I need on the network and possibly others.
 
 Goals
 -----
-No bugs, and never ever support for registering services or taking the role of a proxy.
+Stability, readability, and never ever support for registering services or taking the role as a proxy.
 
 Install
 -------
