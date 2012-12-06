@@ -1,3 +1,4 @@
+#!/usr/bin/gjs
 /**
  * SubZero, a MDNS browser.
  * Copyright (C) 2012 Daniel Svensson
