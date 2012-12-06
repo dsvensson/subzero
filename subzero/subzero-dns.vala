@@ -146,36 +146,36 @@ internal class SubZero.DNS {
 	{
 		for (var i = 0; i < count; i++) {
 			var name = parse_record_name(stream);
-			var type = stream.read_uint16(); // type
-			stream.read_uint16(); // class
-			stream.read_uint32(); // TTL
+			var type = stream.read_uint16();
+			var cls = stream.read_uint16();
+			var ttl = stream.read_uint32();
 			var data_len = stream.read_uint16();
 
 			switch (type) {
 			case RecordType.PTR:
 				var ptr_name = parse_record_name(stream);
-				visitor.pointer_record(name, ptr_name);
+				visitor.pointer_record(name, cls, ttl, ptr_name);
 				break;
 			case RecordType.TXT:
 				var data = new uint8[data_len];
 				stream.read_byte();
 				stream.read(data[0:data.length - 1]);
-				visitor.text_record(name, (string) data);
+				visitor.text_record(name, cls, ttl, (string) data);
 				break;
 			case RecordType.SRV:
 				stream.read_uint16(); // priority
 				stream.read_uint16(); // weight
 				var port = stream.read_uint16();
 				var service_name = parse_record_name(stream);
-				visitor.service_record(name, service_name, port);
+				visitor.service_record(name, cls, ttl, service_name, port);
 				break;
 			case RecordType.A:
 				var addr = parse_inet_address(stream, data_len);
-				visitor.address_record(name, addr);
+				visitor.address_record(name, cls, ttl, addr);
 				break;
 			case RecordType.AAAA:
 				var addr = parse_inet_address(stream, data_len);
-				visitor.address_record(name, addr);
+				visitor.address_record(name, cls, ttl, addr);
 				break;
 			case RecordType.NSEC:
 				parse_record_name(stream); // next domain thing

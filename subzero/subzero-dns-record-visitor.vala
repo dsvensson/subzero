@@ -19,27 +19,27 @@
 
 public interface SubZero.DNSRecordVisitor : GLib.Object
 {
-	public abstract void pointer_record(string name, string domain);
-	public abstract void text_record(string name, string text);
-	public abstract void service_record(string name, string domain, uint16 port);
-	public abstract void address_record(string name, GLib.InetAddress address);
+	public abstract void pointer_record(string name, uint16 cls, uint32 ttl, string domain);
+	public abstract void text_record(string name, uint16 cls, uint32 ttl, string text);
+	public abstract void service_record(string name, uint16 cls, uint32 ttl, string domain, uint16 port);
+	public abstract void address_record(string name, uint16 cls, uint32 ttl, GLib.InetAddress address);
 }
 
 public class SubZero.BaseDNSRecordVisitor : GLib.Object
 {
-	public void pointer_record(string name, string domain)
+	public void pointer_record(string name, uint16 cls, uint32 ttl, string domain)
 	{
 	}
 
-	public void text_record(string name, string text)
+	public void text_record(string name, uint16 cls, uint32 ttl, string text)
 	{
 	}
 
-	public void service_record(string name, string domain, uint16 port)
+	public void service_record(string name, uint16 cls, uint32 ttl, string domain, uint16 port)
 	{
 	}
 
-	public void address_record(string name, GLib.InetAddress address)
+	public void address_record(string name, uint16 cls, uint32 ttl, GLib.InetAddress address)
 	{
 	}
 }
@@ -53,31 +53,31 @@ internal class SubZero.DebugDNSRecordVisitor : GLib.Object, SubZero.DNSRecordVis
 		this.visitor = visitor;
 	}
 
-	public void pointer_record(string name, string domain)
+	public void pointer_record(string name, uint16 cls, uint32 ttl, string domain)
 	{
-		GLib.debug(@"Name: $name, PTR: $domain");
+		GLib.debug(@"Name: $name, Class: $cls, TTL: $ttl, PTR: $domain");
 		if (visitor != null)
-			visitor.pointer_record(name, domain);
+			visitor.pointer_record(name, cls, ttl, domain);
 	}
 
-	public new void text_record(string name, string text)
+	public new void text_record(string name, uint16 cls, uint32 ttl, string text)
 	{
-		GLib.debug(@"Name: $name, TXT: $text");
+		GLib.debug(@"Name: $name, Class: $cls, TTL: $ttl, TXT: $text");
 		if (visitor != null)
-			visitor.pointer_record(name, text);
+			visitor.pointer_record(name, cls, ttl, text);
 	}
 
-	public new void service_record(string name, string domain, uint16 port)
+	public new void service_record(string name, uint16 cls, uint32 ttl, string domain, uint16 port)
 	{
-		GLib.debug(@"Name: $name, SRV: $domain:$port");
+		GLib.debug(@"Name: $name, Class: $cls, TTL: $ttl, SRV: $domain:$port");
 		if (visitor != null)
-			visitor.service_record(name, domain, port);
+			visitor.service_record(name, cls, ttl, domain, port);
 	}
 
-	public new void address_record(string name, GLib.InetAddress address)
+	public new void address_record(string name, uint16 cls, uint32 ttl, GLib.InetAddress address)
 	{
-		GLib.debug(@"Name: $name, A/AAAA: $address");
+		GLib.debug(@"Name: $name, Class: $cls, TTL: $ttl, A/AAAA: $address");
 		if (visitor != null)
-			visitor.address_record(name, address);
+			visitor.address_record(name, cls, ttl, address);
 	}
 }
