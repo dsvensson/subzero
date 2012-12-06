@@ -26,3 +26,7 @@ Install
     ./waf configure --prefix=/usr/local
     ./waf build
     ./waf install
+    
+License
+-------
+[GNU Lesser General Public License, version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html), more details in COPYING.
