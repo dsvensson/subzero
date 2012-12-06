@@ -23,9 +23,10 @@ Stability, readability, and never ever support for registering services or takin
 Install
 -------
 
-    ./waf configure --prefix=/usr/local
+    ./waf configure --prefix=/usr
     ./waf build
     ./waf install
+    sudo ldconfig
     
 License
 -------
