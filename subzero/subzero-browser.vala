@@ -79,8 +79,7 @@ public class SubZero.Browser : GLib.Object
 	public signal void service_added(string service, string hostname, int port);
 	public signal void service_removed(string service, string hostname, int port);
 
-	private GLib.Socket server_socket;
-	private GLib.Socket client_socket;
+	private GLib.Socket socket;
 
 	private GLib.IOChannel channel;
 	private uint server_source = -1;
@@ -117,17 +116,14 @@ public class SubZero.Browser : GLib.Object
 		GLib.assert(!is_running);
 
 		try {
-			server_socket = new GLib.Socket(GLib.SocketFamily.IPV4, GLib.SocketType.DATAGRAM, GLib.SocketProtocol.UDP);
-			server_socket.multicast_ttl = 225;
-			server_socket.multicast_loopback = true;
-			server_socket.bind(new GLib.InetSocketAddress(inet_address_mdns, MDNS_PORT), true);
-			server_socket.join_multicast_group(inet_address_mdns, false, "lo");
+			socket = new GLib.Socket(GLib.SocketFamily.IPV4, GLib.SocketType.DATAGRAM, GLib.SocketProtocol.UDP);
+			socket.multicast_ttl = 225;
+			socket.multicast_loopback = true;
+			socket.bind(new GLib.InetSocketAddress(inet_address_any, MDNS_PORT), true);
+			socket.join_multicast_group(inet_address_mdns, false, "lo");
 
-			channel = new IOChannel.unix_new(server_socket.fd);
+			channel = new IOChannel.unix_new(socket.fd);
 			server_source = channel.add_watch(IOCondition.IN, on_incoming);
-
-			client_socket = new GLib.Socket(GLib.SocketFamily.IPV4, GLib.SocketType.DATAGRAM, GLib.SocketProtocol.UDP);
-			client_socket.bind(new GLib.InetSocketAddress(inet_address_any, MDNS_PORT), true);
 
 			query = DNS.generate_ptr_query(services);
 			send_query();
@@ -159,14 +155,13 @@ public class SubZero.Browser : GLib.Object
 
 		channel = null;
 
-		server_socket = null;
-		client_socket = null;
+		socket = null;
 	}
 
 	private bool send_query()
 	{
 		try {
-			client_socket.send_to(new GLib.InetSocketAddress(inet_address_mdns, MDNS_PORT), query);
+			socket.send_to(new GLib.InetSocketAddress(inet_address_mdns, MDNS_PORT), query);
 		} catch (GLib.Error e) {
 			GLib.warning(@"Could not send query: $(e.message)");
 		}
@@ -177,7 +172,7 @@ public class SubZero.Browser : GLib.Object
 		uint8 buffer[9000];
 
 		try {
-			var bytes_read = server_socket.receive(buffer);
+			var bytes_read = socket.receive(buffer);
 			GLib.debug(@"received $bytes_read bytes");
 			if (bytes_read == 0)
 				return true;
