@@ -28,7 +28,7 @@ def on_service_removed(obj, service, hostname, port):
 sz = SubZero.Browser()
 sz.props.services = ['_xmms2._tcp.local']
 sz.connect('service-added', on_service_added)
-sz.connect('service-added', on_service_removed)
+sz.connect('service-removed', on_service_removed)
 
 sz.start()
 
