@@ -19,12 +19,16 @@
 from gi.repository import GLib
 from gi.repository import SubZero
 
-def on_service_found(obj, service, hostname, port):
-	print "Found %s at %s:%d" % (service, hostname, port)
+def on_service_added(obj, service, hostname, port):
+	print "%s added %s:%d" % (service, hostname, port)
+
+def on_service_removed(obj, service, hostname, port):
+	print "%s removed %s:%d" % (service, hostname, port)
 
 sz = SubZero.Browser()
 sz.props.services = ['_xmms2._tcp.local']
-sz.connect('service-event', on_service_found)
+sz.connect('service-added', on_service_added)
+sz.connect('service-added', on_service_removed)
 
 sz.start()
 

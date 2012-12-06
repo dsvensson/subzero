@@ -24,8 +24,12 @@ public static void main (string[] args)
 	var sc = new SubZero.Browser();
 	sc.services = { "_xmms2._tcp.local" };
 
-	sc.service_event.connect((service, hostname, port) => {
-		GLib.print(@"Found $service at $hostname:$port\n");
+	sc.service_added.connect((service, hostname, port) => {
+		GLib.print(@"$service added $hostname:$port\n");
+	});
+
+	sc.service_removed.connect((service, hostname, port) => {
+		GLib.print(@"$service removed $hostname:$port\n");
 	});
 
 	sc.start();

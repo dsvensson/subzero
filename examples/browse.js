@@ -22,8 +22,11 @@ const SubZero = imports.gi.SubZero
 
 var sz = new SubZero.Browser();
 sz.services = ['_xmms2._tcp.local'];
-sz.connect('service-event', function(obj, service, hostname, port) {
-	print("Found " + service + " at " + hostname + ":" + port);
+sz.connect('service-added', function(obj, service, hostname, port) {
+	print(service + " added " + hostname + ":" + port);
+});
+sz.connect('service-removed', function(obj, service, hostname, port) {
+	print(service + " removed " + hostname + ":" + port);
 });
 
 sz.start();

@@ -19,7 +19,12 @@
 
 internal class SubZero.ServiceVisitor : BaseDNSRecordVisitor, DNSRecordVisitor
 {
-	private GLib.HashTable<string,bool> discovered = new HashTable<string,bool>(str_hash, str_equal);
+	struct ServiceDescription {
+		string hostname;
+		uint16 port;
+	}
+
+	private GLib.HashTable<string,ServiceDescription?> discovered = new HashTable<string,ServiceDescription?>(str_hash, str_equal);
 
 	private Browser browser;
 
@@ -28,12 +33,31 @@ internal class SubZero.ServiceVisitor : BaseDNSRecordVisitor, DNSRecordVisitor
 		this.browser = browser;
 	}
 
+	public new void pointer_record(string name, uint16 cls, uint32 ttl, string domain)
+	{
+		if (ttl != 0)
+			return;
+
+		foreach (var service in browser.services) {
+			if (service != name)
+				continue;
+			unowned ServiceDescription? description = discovered.lookup(domain);
+			if (description != null) {
+				browser.service_removed(name, description.hostname, description.port);
+				discovered.remove(domain);
+				break;
+			}
+		}
+	}
+
 	public new void service_record(string name, uint16 cls, uint32 ttl, string hostname, uint16 port)
 	{
 		foreach (var service in browser.services) {
-			if (name.has_suffix(service) && !discovered.contains(name)) {
-				discovered.add(name);
-				browser.service_event(service, hostname, port);
+			if (!name.has_suffix(service))
+			    continue;
+			if (!discovered.contains(name)) {
+				discovered.insert(name, { hostname, port });
+				browser.service_added(service, hostname, port);
 				break;
 			}
 		}
@@ -50,7 +74,8 @@ public class SubZero.Browser : GLib.Object
 	private GLib.InetAddress inet_address_mdns = new GLib.InetAddress.from_string("224.0.0.251");
 	// private GLib.InetAddress inet6_address_mdns = new GLib.InetAddress.from_string("ff02::fb");
 
-	public signal void service_event(string service, string hostname, int port);
+	public signal void service_added(string service, string hostname, int port);
+	public signal void service_removed(string service, string hostname, int port);
 
 	private GLib.Socket server_socket;
 	private GLib.Socket client_socket;
