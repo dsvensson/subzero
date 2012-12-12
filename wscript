@@ -27,7 +27,7 @@ def configure(conf):
 	conf.find_program('g-ir-compiler', var='G_IR_COMPILER', mandatory=0)
 
 	conf.env.VALADEFINES = []
-	if conf.check_cc(fragment=SO_REUSEPORT_FRAGMENT, execute=True, define_name='PLATFORM_SO_REUSEPORT', mandatory=False):
+	if conf.check_cc(fragment=SO_REUSEPORT_FRAGMENT, execute=True, mandatory=False):
 		conf.env.VALADEFINES = ['HAVE_SO_REUSEPORT']
 
 def build(bld):
