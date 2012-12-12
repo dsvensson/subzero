@@ -119,6 +119,10 @@ public class SubZero.Browser : GLib.Object
 			socket = new GLib.Socket(GLib.SocketFamily.IPV4, GLib.SocketType.DATAGRAM, GLib.SocketProtocol.UDP);
 			socket.multicast_ttl = 225;
 			socket.multicast_loopback = true;
+#if HAVE_SO_REUSEPORT
+			int32 enable = 1;
+			Posix.setsockopt(socket.fd, Platform.Socket.SOL_SOCKET, Platform.Socket.SO_REUSEPORT, &enable, (Posix.socklen_t) sizeof(int));
+#endif
 			socket.bind(new GLib.InetSocketAddress(inet_address_any, MDNS_PORT), true);
 			socket.join_multicast_group(inet_address_mdns, false, "lo");
 
