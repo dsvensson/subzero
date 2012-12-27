@@ -24,6 +24,12 @@ Supported Platforms
 -------------------
 The library and the examples have been tested on both Debian GNU/Linux and Mac OS X 10.8.
 
+
+Build Status
+------------
+* Ubuntu 12.10
+    * [![Build Status](https://travis-ci.org/dsvensson/subzero.png)](https://travis-ci.org/dsvensson/subzero)
+
 Install
 -------
 
