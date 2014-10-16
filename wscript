@@ -23,6 +23,7 @@ def options(opt):
 
 def configure(conf):
 	conf.load('compiler_c vala')
+	conf.check_vala((0, 24, 0))
 	conf.check_cfg(package='gio-2.0', atleast_version='2.34.0', args='--cflags --libs')
 	conf.check_cfg(package='gobject-introspection-1.0', mandatory=False)
 	conf.find_program('g-ir-compiler', var='G_IR_COMPILER', mandatory=False)
