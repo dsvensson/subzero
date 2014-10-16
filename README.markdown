@@ -37,7 +37,9 @@ Install
     ./waf build
     sudo ./waf install
     sudo ldconfig
-    
+
+To build the GObject Introspection typelib `gobject-introspection` and `libgirepository1.0-dev` are needed.
+
 License
 -------
 [GNU Lesser General Public License, version 2.1](https://www.gnu.org/licenses/lgpl-2.1.html), more details in COPYING.

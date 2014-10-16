@@ -11,7 +11,7 @@ bld.shlib(
 	vala_target_glib = '2.34',
 )
 
-if bld.env.G_IR_COMPILER:
+if bld.env.G_IR_COMPILER and bld.is_defined('HAVE_GOBJECT_INTROSPECTION_1_0'):
 	bld(
 		name = 'typelib',
 		after = 'subzero',
