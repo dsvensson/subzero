@@ -149,7 +149,9 @@ internal class SubZero.DNS {
 			var type = stream.read_uint16();
 			var cls = stream.read_uint16();
 			var ttl = stream.read_uint32();
+
 			var data_len = stream.read_uint16();
+			var position = stream.tell();
 
 			switch (type) {
 			case RecordType.PTR:
@@ -177,15 +179,12 @@ internal class SubZero.DNS {
 				var addr = parse_inet_address(stream, data_len);
 				visitor.address_record(name, cls, ttl, addr);
 				break;
-			case RecordType.NSEC:
-				parse_record_name(stream); // next domain thing
-				for (var j = stream.read_byte(); j > 0; j--)
-					stream.read_byte();
-				break;
 			default:
-				GLib.warning("Unknown type: %04x", type);
+				GLib.debug("Unknown type: %04x (len: %d)", type, data_len);
 				break;
 			}
+
+			stream.seek(position + data_len, GLib.SeekType.SET);
 		}
 	}
 
