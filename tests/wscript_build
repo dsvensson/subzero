@@ -1,0 +1,31 @@
+from waflib import Logs
+
+# Shamelessly stolen from waf's demo directory
+def summary(bld):
+	lst = getattr(bld, 'utest_results', [])
+	if lst:
+		total = len(lst)
+		tfail = len([x for x in lst if x[1]])
+
+		val = 100 * (total - tfail) / (1.0 * total)
+		Logs.pprint('CYAN', 'test report %3.0f%% success' % val)
+
+		Logs.pprint('CYAN', '  tests that fail %d/%d' % (tfail, total))
+		for (f, code, out, err) in lst:
+			if code:
+				Logs.pprint('CYAN', '     %s' % f)
+				Logs.pprint('RED', 'status: %r' % code)
+				if out: Logs.pprint('RED', 'out: %r' % out)
+				if err: Logs.pprint('RED', 'err: %r' % err)
+
+bld(
+	features     = 'c cprogram test',
+	target       = 'test',
+	source       = 'gee-test-case.vala test-main.vala test-dns.vala',
+	uselib       = 'GIO-2.0',
+	use          = 'subzero-dns',
+	packages     = 'gio-2.0',
+	install_path = False
+)
+
+bld.add_post_fun(summary)

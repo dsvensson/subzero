@@ -1,22 +1,41 @@
-bld.shlib(
+from waflib.TaskGen import feature
+
+@feature('valainternal')
+def valainternal(self):
+	self.env.append_unique('VALAFLAGS', [
+		'--internal-vapi=%s.vapi' % self.vala_internal,
+		'--internal-header=%s.h' % self.vala_internal
+	])
+
+bld(
+	features         = 'c valainternal',
+	packages         = 'gio-2.0',
+	target           = 'subzero-dns',
+	source           = 'subzero-dns.vala subzero-dns-record-visitor.vala',
+	vala_target_glib = '2.34',
+	vala_internal    = 'subzero-dns'
+)
+
+bld(
+	features         = 'c cshlib',
 	packages         = 'gio-2.0',
 	packages_private = 'platform-socket posix',
-	features         = 'c cshlib',
 	target           = 'subzero',
+	use              = 'subzero-dns',
 	uselib           = 'GIO-2.0',
-	source           = 'subzero-browser.vala subzero-dns.vala subzero-dns-record-visitor.vala subzero-util.vala',
+	source           = 'subzero-browser.vala subzero-util.vala',
 	gir              = 'SubZero-0.1',
 	vapi_dirs        = '../vapi',
 	vala_defines     = bld.env.VALADEFINES,
-	vala_target_glib = '2.34',
+	vala_target_glib = '2.34'
 )
 
 if bld.env.G_IR_COMPILER and bld.is_defined('HAVE_GOBJECT_INTROSPECTION_1_0'):
 	bld(
-		name = 'typelib',
-		after = 'subzero',
-		source = 'SubZero-0.1.gir',
-		target = 'SubZero-0.1.typelib',
-		rule = '${G_IR_COMPILER} --shared-library=libsubzero ${SRC} -o ${TGT}',
+		name         = 'typelib',
+		after        = 'subzero',
+		source       = 'SubZero-0.1.gir',
+		target       = 'SubZero-0.1.typelib',
+		rule         = '${G_IR_COMPILER} --shared-library=libsubzero ${SRC} -o ${TGT}',
 		install_path = '${LIBDIR}/girepository-1.0'
 	)

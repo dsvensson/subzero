@@ -12,3 +12,6 @@ README.markdown:
 
 waf:
 		BSD 3-Clause License, https://code.google.com/p/waf/
+
+tests/gee-test-case.vala
+        Licensed under LGPL, by 2009 Julien Peeters <contact@julienpeeters.fr>
