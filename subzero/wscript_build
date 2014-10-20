@@ -27,7 +27,8 @@ bld(
 	gir              = 'SubZero-0.1',
 	vapi_dirs        = '../vapi',
 	vala_defines     = bld.env.VALADEFINES,
-	vala_target_glib = '2.34'
+	vala_target_glib = '2.34',
+	linkflags        = '-Wl,--retain-symbols-file=../subzero/exported-symbols.def'
 )
 
 if bld.env.G_IR_COMPILER and bld.is_defined('HAVE_GOBJECT_INTROSPECTION_1_0'):
