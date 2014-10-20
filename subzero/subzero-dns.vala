@@ -90,55 +90,57 @@ internal class SubZero.DNS {
 		throws GLib.Error
 	{
 		uint8 buffer[256]; // MAX_NAME_LENGTH
-		uint8 pos = 0;
+		uint8 position = 0;
 
-		parse_record_name_recurse(stream, buffer, ref pos);
+		parse_record_name_recurse(stream, buffer, ref position);
 
 		return (string) buffer;
 	}
 
-	private static void parse_record_name_recurse(GLib.DataInputStream stream, uint8[] name, ref uint8 pos)
+	private static void parse_record_name_recurse(GLib.DataInputStream stream, uint8[] name, ref uint8 position)
 		throws GLib.Error
 	{
 		while (true) {
-			var len = stream.read_byte();
-			if (len == 0)
+			var length = stream.read_byte();
+			if (length == 0)
 				break;
 
 			/* If first two bits sets, remaining part of the name
 			 * can be found at the offset found in 14 bits.
 			 */
-			if ((len & 0xc0) != 0) {
-				var seek_pos = (uint16)((len & ~0xc0) << 8 | stream.read_byte());
-				var restore_pos = stream.tell();
-				stream.seek(seek_pos, GLib.SeekType.SET);
-				parse_record_name_recurse(stream, name, ref pos);
-				stream.seek(restore_pos, GLib.SeekType.SET);
+			if ((length & 0xc0) != 0) {
+				var seek_position = (uint16)((length & ~0xc0) << 8 | stream.read_byte());
+				var restore_position = stream.tell();
+				stream.seek(seek_position, GLib.SeekType.SET);
+				parse_record_name_recurse(stream, name, ref position);
+				stream.seek(restore_position, GLib.SeekType.SET);
 				/* A jump is always the tail */
 				break;
 			}
 
-			if (len > MAX_LABEL_LENGTH)
+			if (length > MAX_LABEL_LENGTH)
 				break;
 
-			if ((pos + len + 1) >= name.length)
+			if ((position + length + 1) >= name.length)
 				break;
 
-			if (pos > 0)
-				name[pos++] = '.';
+			if (position > 0)
+				name[position++] = '.';
 
-			stream.read(name[pos:pos + len]);
-			pos += len;
+			stream.read(name[position:position + length]);
+			position += length;
 		}
 	}
 
-	private static GLib.InetAddress parse_inet_address(GLib.DataInputStream stream, uint16 len)
+	private static GLib.InetAddress parse_inet_address(GLib.DataInputStream stream, uint16 length)
 		throws GLib.IOError
-		requires(len == 4 || len == 16)
+		requires(length == 4 || length == 16)
 	{
 		uint8 buffer[16];
-		stream.read(buffer[0:len]);
-		return new GLib.InetAddress.from_bytes(buffer[0:len], (len == 4) ? GLib.SocketFamily.IPV4 : GLib.SocketFamily.IPV6);
+		stream.read(buffer[0:length]);
+		if (length == 4)
+			return new GLib.InetAddress.from_bytes(buffer[0:length], GLib.SocketFamily.IPV4);
+		return new GLib.InetAddress.from_bytes(buffer[0:length], GLib.SocketFamily.IPV6);
 	}
 
 	private static void parse_record(GLib.DataInputStream stream, uint16 count, DNSRecordVisitor visitor)
@@ -150,7 +152,7 @@ internal class SubZero.DNS {
 			var cls = stream.read_uint16();
 			var ttl = stream.read_uint32();
 
-			var data_len = stream.read_uint16();
+			var length = stream.read_uint16();
 			var position = stream.tell();
 
 			switch (type) {
@@ -159,7 +161,7 @@ internal class SubZero.DNS {
 				visitor.pointer_record(name, cls, ttl, ptr_name);
 				break;
 			case RecordType.TXT:
-				var data = new uint8[data_len];
+				var data = new uint8[length];
 				stream.read_byte();
 				stream.read(data[0:data.length - 1]);
 				visitor.text_record(name, cls, ttl, (string) data);
@@ -172,19 +174,19 @@ internal class SubZero.DNS {
 				visitor.service_record(name, cls, ttl, service_name, port);
 				break;
 			case RecordType.A:
-				var addr = parse_inet_address(stream, data_len);
+				var addr = parse_inet_address(stream, length);
 				visitor.address_record(name, cls, ttl, addr);
 				break;
 			case RecordType.AAAA:
-				var addr = parse_inet_address(stream, data_len);
+				var addr = parse_inet_address(stream, length);
 				visitor.address_record(name, cls, ttl, addr);
 				break;
 			default:
-				GLib.debug("Unknown type: %04x (len: %d)", type, data_len);
+				GLib.debug("Unknown type: %04x, payload size: %d", type, length);
 				break;
 			}
 
-			stream.seek(position + data_len, GLib.SeekType.SET);
+			stream.seek(position + length, GLib.SeekType.SET);
 		}
 	}
 
